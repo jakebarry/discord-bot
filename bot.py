@@ -41,7 +41,7 @@ def get_db_session():
     return collection
 
 
-
+# Initial bot message
 @bot.event
 async def on_ready():
     channel = bot.get_channel(CHANNEL_ID)
