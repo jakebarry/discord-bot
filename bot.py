@@ -8,8 +8,10 @@ import discord
 from discord import Intents
 import pymongo
 from pymongo import MongoClient
-
-
+import validators
+import tldextract
+import requests
+from bs4 import BeautifulSoup
 
 load_dotenv(override=True)
 
@@ -24,6 +26,9 @@ intents.message_content = True
 # print(type(CHANNEL_ID))
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+
+accepted_websites = ["recipetineats"]
+
 
 # Initialise meal class
 class Meal:
@@ -63,17 +68,90 @@ async def hello(ctx):
 
 #     await ctx.send(f"Result = {result}")
 
+# !addmeal: Allows user to provide a URL for a meal to be added to the database
 @bot.command(brief='Provide a URL for a meal to add to the database')
 async def addmeal(ctx):
     await ctx.send("Send the link of the recipe you would like to add to the database")
 
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel
+    
     try:
-        user_link = await bot.wait_for('message', check=check, timeout=60)
+        user_link_choice = await bot.wait_for('message', check=check, timeout=60)
     except asyncio.TimeoutError:
         await ctx.send("You took too long to respond.")
-    return
+        return
+    
+    link_choice = user_link_choice.content.lower()
 
-    # await ctx.send("Sorry! Function not implemented yet.")
+    valid = validators.url(link_choice)
+
+    website_domain = tldextract.extract(link_choice).domain
+
+    # Check if website is supported
+    if website_domain not in accepted_websites:
+        await ctx.send("This website is not currently supported. Use !websites to see a supported list.")
+        return
+
+    # Check if website is valid
+    if valid:
+        await ctx.send("That URL is valid, thank-you.")
+    else:
+        await ctx.send("Invalid URL. Try again.")
+
+    if recipe_scraper(ctx, link_choice):
+        await ctx.send("Recipe has been added.")
+    else:
+        await ctx.send("Invalid URL. Make sure the URL directs toward a recipe with ingredients and instructions.")
+
+    
+
+
+
+
+def recipe_scraper(ctx, URL):
+    page = requests.get(URL)
+
+    soup = BeautifulSoup(page.content, "html.parser")
+
+    results = soup.find(id="wprm-recipe-container-25094")
+
+    try:
+        recipe_name = results.find("h2", class_="wprm-recipe-name wprm-block-text-bold")
+        ingredient_elements = results.find_all("li", class_="wprm-recipe-ingredient")
+        instruction_elements = results.find_all("li", class_="wprm-recipe-instruction")
+    except AttributeError as e:
+        print(e)
+        return False
+    
+    # ingredient_elements = results.find_all("span", class_="wprm-recipe-ingredient-name")
+
+
+    print(f"\n               {recipe_name.text}               ")
+    print("\n**Ingredients:**\n")
+    for ingredient_element in ingredient_elements:
+        amount_element = ingredient_element.find("span", class_="wprm-recipe-ingredient-amount")
+        unit_element = ingredient_element.find("span", class_="wprm-recipe-ingredient-unit")
+        name_element = ingredient_element.find("span", class_="wprm-recipe-ingredient-name")
+        if amount_element != None:
+            print(f"{amount_element.text} ", end="")
+        if unit_element != None:
+            print(f"{unit_element.text} ", end="")
+        if name_element != None:
+            print(name_element.text)
+    print()
+
+    print("\n**Instructions:**\n")
+    index = 1
+    for instruction_element in instruction_elements:
+        text_element = instruction_element.find("div", class_="wprm-recipe-instruction-text")
+        if text_element != None:
+            print(f"{index}: {text_element.text}")
+            index += 1
+        
+    print()
+    return True
+
 
 
 @bot.command(brief='See accepted websites to use for a recipe submission')
