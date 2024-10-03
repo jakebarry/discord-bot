@@ -69,6 +69,15 @@ async def hello(ctx):
 
 #     await ctx.send(f"Result = {result}")
 
+
+@bot.command(name='survey')
+async def survey(ctx):
+    # Prompt the user with questions here
+    await ctx.send('What is your username?')
+
+
+
+
 # !addmeal: Allows user to provide a URL for a meal to be added to the database
 @bot.command(brief='Provide a URL for a meal to add to the database')
 async def addmeal(ctx):
@@ -187,11 +196,17 @@ def recipe_scraper(ctx, URL, category):
         if amount_element != None:
             ingredient["amount"] = amount_element.text
             # print(f"{amount_element.text} ", end="")
+        else:
+            ingredient["amount"] = ""
         if unit_element != None:
             ingredient["unit"] = unit_element.text
             # print(f"{unit_element.text} ", end="")
+        else:
+            ingredient["unit"] = ""
         if name_element != None:
             ingredient["name"] = name_element.text
+        else:
+            ingredient["name"] = ""
             # print(name_element.text)
 
         # ingredient = {
@@ -307,7 +322,14 @@ async def planmeal(ctx):
     
     if meals_list:
         selected_meal = random.choice(meals_list)
-        await ctx.send(f"Here's your meal suggestion based on your choice:\n{selected_meal['Meal']}")
+        await ctx.send(f"Here's your meal suggestion based on your choice:\n\n                          **{selected_meal['name']}**")
+        await ctx.send("**INGREDIENTS**")
+        for ingredient in selected_meal['ingredients']:
+            await ctx.send(f"{ingredient['amount']} {ingredient['unit']} {ingredient['name']}")
+        await ctx.send("\n**INSTRUCTIONS**\n")
+        for instruction in selected_meal['instructions']:
+            await ctx.send(f"**{instruction['step']}.** {instruction['description']}")
+
     else:
         await ctx.send("No meals found for the selected category.")
 
