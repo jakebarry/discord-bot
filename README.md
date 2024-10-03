@@ -48,16 +48,12 @@ A simple Discord bot built with Python that helps users with recipe planning. Th
 - Requests
 - Dotenv
 - PyMongo
-- validators
-- tldextract
+- Validators
+- TLDextract
 
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request if you have suggestions for improvements.
-
-## License
-
-This project is licensed under the MIT License.
 
 ## Author
 
