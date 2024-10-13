@@ -10,6 +10,10 @@ A simple Discord bot built with Python that helps users with recipe planning. Th
 
 ## Installation
 
+### Prerequisites
+Ensure you have Python 3.12 or the version specified in the Makefile installed on your system.
+
+### Clone and Setup
 1. Clone the repository:
    ```bash
    git clone https://github.com/jakebarry/discord-bot.git
@@ -20,29 +24,48 @@ A simple Discord bot built with Python that helps users with recipe planning. Th
    cd discord-bot
    ```
 
-3. Create a virtual environment (optional but recommended):
+### Using the Makefile
+
+The Makefile automates the process of setting up the virtual environment, installing dependencies, and ensuring code formatting. Follow these steps to streamline the setup:
+
+3. **Create a virtual environment and install dependencies:**
+   Run the following command to automatically create a virtual environment and install the required dependencies:
    ```bash
-   python -m venv .venv
+   make install
    ```
 
-4. Activate the virtual environment:
+4. **Activate the virtual environment (optional):**
+   The Makefile uses the virtual environment directly, but if you want to manually activate it:
    - On Windows:
      ```bash
-     .venv\Scripts\activate
+     venv\Scripts\activate
      ```
    - On macOS/Linux:
      ```bash
-     source .venv/bin/activate
+     source venv/bin/activate
      ```
 
-5. Install the required dependencies:
-   ```bash
-   pip install requests discord dotenv pymongo beautifulsoup4 validators tldextract
-   ```
+### Code Formatting
+To ensure the code adheres to the formatting standards set by `ruff`, run:
+```bash
+make format
+```
+
+### Running the Bot
+To run the Discord Recipe Planner bot:
+```bash
+make run
+```
+
+### Cleaning the Environment
+To remove the virtual environment and clean up the project directory:
+```bash
+make clean
+```
 
 ## Technologies Used
 
-- Python
+- Python 3.12
 - Discord.py
 - Beautiful Soup
 - Requests
@@ -50,6 +73,7 @@ A simple Discord bot built with Python that helps users with recipe planning. Th
 - PyMongo
 - Validators
 - TLDextract
+- Ruff (for formatting)
 
 ## Contributing
 

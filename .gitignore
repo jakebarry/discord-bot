@@ -1,5 +1,6 @@
 .env
 .venv
+venv
 py-vis.py
 dataann_example.py
 pandas-scrape.py
